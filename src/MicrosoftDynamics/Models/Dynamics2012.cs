@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using MicrosoftDynamics.Abstractions;
 
 namespace MicrosoftDynamics.Models
 {
@@ -8,16 +10,78 @@ namespace MicrosoftDynamics.Models
     /// <remarks>
     ///     https://msdn.microsoft.com/en-us/library/gg848856.aspx
     /// </remarks>
-    public static class Dynamics2012
+    public class Dynamics2012 : IAxTimeZoneMapper
     {
+        private readonly IDictionary<string, TimeZoneInfo> mapDynamics;
+
+        private readonly IDictionary<string, DynamicsAxTimeZone> mapTimeZones;
+
         /// <summary>
         ///     List of <see cref="DynamicsAxTimeZone" /> objects
         /// </summary>
-        public static readonly IReadOnlyCollection<DynamicsAxTimeZone> TimeZones;
+        private readonly IReadOnlyCollection<DynamicsAxTimeZone> timeZones;
 
         static Dynamics2012()
         {
-            TimeZones = new List<DynamicsAxTimeZone>
+            Current = new Dynamics2012();
+        }
+
+        /// <summary>
+        ///     Create a new instance of <see cref="Dynamics2012" />
+        /// </summary>
+        private Dynamics2012()
+        {
+            timeZones = CreateTimeZones();
+            mapDynamics = new Dictionary<string, TimeZoneInfo>(timeZones.Count);
+            mapTimeZones = new Dictionary<string, DynamicsAxTimeZone>(timeZones.Count);
+            // Build mapping
+            BuildMapping();
+        }
+
+        /// <summary>
+        ///     Singleton instance of <see cref="Dynamics2012" />
+        /// </summary>
+        public static Dynamics2012 Current { get; private set; }
+
+        public string AxVersion { get; } = DynamicsAxVersion.Ax2012;
+
+        public DynamicsAxTimeZone ConvertToAx(string standardName)
+        {
+            if (!mapTimeZones.ContainsKey(standardName))
+            {
+                throw new InvalidOperationException($"Could not find any value for '{standardName}'");
+            }
+            return mapTimeZones[standardName];
+        }
+
+        public TimeZoneInfo ConvertFromAx(string name)
+        {
+            if (!mapDynamics.ContainsKey(name))
+            {
+                throw new InvalidOperationException($"Could not find any value for '{name}'");
+            }
+            return mapDynamics[name];
+        }
+
+        private void BuildMapping()
+        {
+            foreach (var dynamicsAxTimeZone in timeZones)
+            {
+                foreach (var systemTimeZone in TimeZoneInfo.GetSystemTimeZones())
+                {
+                    // Patch name to establish relation
+                    if (PatchDisplayName(dynamicsAxTimeZone.Description, true).Equals(systemTimeZone.DisplayName))
+                    {
+                        mapDynamics[dynamicsAxTimeZone.Name] = systemTimeZone;
+                        mapTimeZones[systemTimeZone.StandardName] = dynamicsAxTimeZone;
+                    }
+                }
+            }
+        }
+
+        private static List<DynamicsAxTimeZone> CreateTimeZones()
+        {
+            return new List<DynamicsAxTimeZone>
             {
                 new DynamicsAxTimeZone("GMTMINUS1200INTERNATIONALDATELINEWEST", 24,
                     "(GMT-12:00) International Date Line West"),
@@ -140,6 +204,11 @@ namespace MicrosoftDynamics.Models
                 new DynamicsAxTimeZone("GMTMINUS1100MIDWAYISLAND_SAMOA", 65, "(GMT+13:00) Samoa"),
                 new DynamicsAxTimeZone("GMTPLUS1300NUKU_ALOFA", 73, "(GMT+13:00) Nuku'alofa")
             };
+        }
+
+        private static string PatchDisplayName(string displayName, bool toZimeZone)
+        {
+            return toZimeZone ? displayName.Replace("(GMT", "(UTC") : displayName.Replace("(UTC", "(GMT");
         }
     }
 }

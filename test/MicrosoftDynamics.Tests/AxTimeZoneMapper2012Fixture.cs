@@ -7,21 +7,34 @@ namespace MicrosoftDynamics.Tests
     public class AxTimeZoneMapper2012Fixture
     {
         [TestMethod]
-        public void Convert_Exists()
+        public void ConvertToAx_Exists()
         {
             // Arrange
             var mapper = DynamicsAxTimeZoneManager.Current.Create(DynamicsAxVersion.Ax2012);
             var timeZone = TimeZoneInfo.FindSystemTimeZoneById("W. Europe Standard Time");
             // Act
-            var obj = mapper.ConvertToAx(timeZone.DisplayName);
+            var obj = mapper.ConvertToAx(timeZone.StandardName);
             // Assert
             Assert.IsNotNull(obj);
             Assert.AreEqual(79, obj.Value);
         }
 
         [TestMethod]
+        public void ConveryFromAx_Exists()
+        {
+            // Arrange
+            var mapper = DynamicsAxTimeZoneManager.Current.Create(DynamicsAxVersion.Ax2012);
+            var timeZone = TimeZoneInfo.FindSystemTimeZoneById("W. Europe Standard Time");
+            // Act
+            var obj = mapper.ConvertFromAx("GMTPLUS0100_AMSTERDAM_BERLIN_BERN_ROME");
+            // Assert
+            Assert.IsNotNull(obj);
+            Assert.AreEqual(obj.Id, timeZone.Id);
+        }
+
+        [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Convert_NotExists()
+        public void ConvertToAx_NotExists()
         {
             // Arrange
             var mapper = DynamicsAxTimeZoneManager.Current.Create(DynamicsAxVersion.Ax2012);

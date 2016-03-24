@@ -4,8 +4,6 @@ namespace MicrosoftDynamics.Models
 {
     public struct DynamicsAxTimeZone
     {
-        public static readonly DynamicsAxTimeZone Null = new DynamicsAxTimeZone(null, 0, null);
-
         internal DynamicsAxTimeZone(string name, int value, string description)
         {
             Description = description;

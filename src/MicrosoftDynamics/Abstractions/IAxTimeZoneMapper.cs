@@ -14,16 +14,22 @@ namespace MicrosoftDynamics.Abstractions
         string AxVersion { get; }
 
         /// <summary>
-        ///     Get the <see cref="DynamicsAxTimeZone" /> object for the <paramref name="timeZoneDisplayName" />
+        ///     Get the <see cref="DynamicsAxTimeZone" /> object for the <paramref name="standardName" />
         /// </summary>
-        /// <remarks>
-        ///     The <see cref="TimeZoneInfo.DisplayName" /> contains UTC and the <see cref="DynamicsAxTimeZone.Description" /> has
-        ///     GMT. Prior to lookup
-        ///     a string replace is done for UTC -> GMT
-        /// </remarks>
-        /// <param name="timeZoneDisplayName">Time zone display name</param>
+        /// <param name="standardName">Time zone standard name</param>
         /// <returns>A <see cref="DynamicsAxTimeZone" /></returns>
         /// <exception cref="InvalidOperationException">If no object is found</exception>
-        DynamicsAxTimeZone ConvertToAx(string timeZoneDisplayName);
+        DynamicsAxTimeZone ConvertToAx(string standardName);
+
+        /// <summary>
+        ///     Get the <see cref="TimeZoneInfo" /> object from <paramref name="name" />
+        /// </summary>
+        /// <remarks>
+        ///     The parameter <paramref name="name" /> should be the format of <see cref="DynamicsAxTimeZone.Name" />
+        /// </remarks>
+        /// <param name="name">The name for the Dynamics AX time zone</param>
+        /// <returns>A <see cref="TimeZoneInfo" /></returns>
+        /// <exception cref="InvalidOperationException">If no object is found</exception>
+        TimeZoneInfo ConvertFromAx(string name);
     }
 }

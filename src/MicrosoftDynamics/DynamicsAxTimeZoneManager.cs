@@ -21,7 +21,7 @@ namespace MicrosoftDynamics
         {
             if (DynamicsAxVersion.Ax2012.Equals(version))
             {
-                return new AxTimeZoneMapper(version, Dynamics2012.TimeZones);
+                return Dynamics2012.Current;
             }
             // TODO: Add more
             throw new InvalidOperationException($"'{version}' is not supported. See DynamicsAxVersion for valid values");
