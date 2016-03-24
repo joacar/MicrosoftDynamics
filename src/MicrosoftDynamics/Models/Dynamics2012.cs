@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using MicrosoftDynamics.Abstractions;
 
+using static System.Diagnostics.Debug;
+
 namespace MicrosoftDynamics.Models
 {
     /// <summary>
@@ -32,6 +34,7 @@ namespace MicrosoftDynamics.Models
         private Dynamics2012()
         {
             timeZones = CreateTimeZones();
+            WriteLine($"Registered {timeZones.Count} time zones for '{AxVersion}'");
             mapDynamics = new Dictionary<string, TimeZoneInfo>(timeZones.Count);
             mapTimeZones = new Dictionary<string, DynamicsAxTimeZone>(timeZones.Count);
             // Build mapping
@@ -70,13 +73,16 @@ namespace MicrosoftDynamics.Models
                 foreach (var systemTimeZone in TimeZoneInfo.GetSystemTimeZones())
                 {
                     // Patch name to establish relation
-                    if (PatchDisplayName(dynamicsAxTimeZone.Description, true).Equals(systemTimeZone.DisplayName))
+                    var patch = PatchDisplayName(dynamicsAxTimeZone.Description, true);
+                    if (patch.Equals(systemTimeZone.DisplayName))
                     {
                         mapDynamics[dynamicsAxTimeZone.Name] = systemTimeZone;
                         mapTimeZones[systemTimeZone.StandardName] = dynamicsAxTimeZone;
+                        break;
                     }
                 }
             }
+            WriteLine($"Established mapping to TimeZoneInfo objects for {mapDynamics.Count} time zones");
         }
 
         private static List<DynamicsAxTimeZone> CreateTimeZones()

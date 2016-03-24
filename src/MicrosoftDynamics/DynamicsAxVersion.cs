@@ -12,10 +12,10 @@ namespace MicrosoftDynamics
     {
         internal static readonly string[] SupportedVersions;
 
-        public static readonly string AxLatest = "latest";
-        public static readonly string Ax2012 = "2012";
-        public static readonly string Ax2009 = "2009";
-        public static readonly string Ax40 = "4.0";
+        public static readonly string AxLatest = "Dynamics AX (Latest)";
+        public static readonly string Ax2012 = "Dynamics AX 2012";
+        public static readonly string Ax2009 = "Dynamics AX 2009";
+        public static readonly string Ax40 = "Dynamics AX 4.0";
 
         static DynamicsAxVersion()
         {
